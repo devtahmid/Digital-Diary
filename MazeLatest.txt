@@ -1,0 +1,173 @@
+#include"stdafx.h"
+#include<iostream>
+#include<conio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<Windows.h>
+using namespace std;
+
+char maze[24][70]; // actual length of each row=69 , 70 for '\o'
+char symbol[4]="^_^";
+int score=0;
+
+void gotoxy(int x, int y)
+{
+	COORD c={x,y};
+	SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE),c);
+
+}
+
+
+struct player_pos{
+int x;
+int y;
+}symbol_pos[3];     //symbol_pos represents players cordinates
+
+void check(char &p)     //to check if the move is possble or not, if not possible -> means colliding with wall
+{strcpy_s(symbol,"^_^");
+	switch(p)
+	{
+	case 'w':symbol_pos[0].y-=1;
+             symbol_pos[1].y-=1;
+             symbol_pos[2].y-=1;
+			 break;
+           
+	case 'a':symbol_pos[0].x-=1;
+             symbol_pos[1].x-=1;
+             symbol_pos[2].x-=1;
+		     break;
+           
+    case 's':symbol_pos[0].y+=1;
+             symbol_pos[1].y+=1;
+             symbol_pos[2].y+=1;
+			 break;
+
+    case 'd':symbol_pos[0].x+=1;
+             symbol_pos[1].x+=1;
+             symbol_pos[2].x+=1;
+			 break;
+    }
+
+for(int k=0;k<3;++k)
+if(maze[symbol_pos[k].y-1][symbol_pos[k].x]=='|'||maze[symbol_pos[k].y-1][symbol_pos[k].x]=='_'||maze[symbol_pos[k].y-1][symbol_pos[k].x]=='-'||maze[symbol_pos[k].y-1][symbol_pos[k].x]=='+')
+   {//if entered here then colliding with wall so reversing changes to keep player in original place
+    
+	   switch(p)
+	{
+	case 'w':symbol_pos[0].y+=1;
+             symbol_pos[1].y+=1;
+             symbol_pos[2].y+=1;
+			 break;
+           
+	case 'a':symbol_pos[0].x+=1;
+             symbol_pos[1].x+=1;
+             symbol_pos[2].x+=1;
+		     break;
+           
+    case 's':symbol_pos[0].y-=1;
+             symbol_pos[1].y-=1;
+             symbol_pos[2].y-=1;
+			 break;
+
+    case 'd':symbol_pos[0].x-=1;
+             symbol_pos[1].x-=1;
+             symbol_pos[2].x-=1;
+			 break;
+    }
+
+
+   }
+
+for(int k=0;k<3;++k)
+if(maze[symbol_pos[k].y-1][symbol_pos[k].x]=='$')
+{
+score+=5;
+strcpy_s(symbol,"*_*");
+maze[symbol_pos[k].y-1][symbol_pos[k].x]=' ';
+}
+
+
+
+}    //check ends
+
+
+void move(char p){     //decides players position after evry move
+int k;
+for(k=0;k<=2;++k)
+{gotoxy(symbol_pos[k].x,symbol_pos[k].y);
+cout<<" ";
+}
+ check(p);
+for(k=0;k<=2;++k)
+{gotoxy(symbol_pos[k].x,symbol_pos[k].y);
+ cout<<symbol[k];
+}
+
+}//end of move
+//
+void main(){
+
+
+//global maze , body
+strcpy_s(maze[0], "_____________________________________________________________________");
+strcpy_s(maze[1], "|       |               |                       |$$ |       |       |");
+strcpy_s(maze[2], "|       |               |                       |   |       |       |");
+strcpy_s(maze[3], "|   |        ---+---    |   +-----------+---    |       |   |   |   |");
+strcpy_s(maze[4], "|   |           |       |   |           |       |       |   |$$ |   |");
+strcpy_s(maze[5], "|   +---+---+----   |       |    ---+        ---|-------|   +---|   |");
+strcpy_s(maze[6], "|       | $ |       |   $   |     $ |           |       |       |   |");
+strcpy_s(maze[7], "|---    |   |    ---+-------|---------------+   |   |   |---    |   |");
+strcpy_s(maze[8], "|       |   |               |         $     |   | $ |   |       |   |");
+strcpy_s(maze[9], "|    ---+   +---+---    |       +-------+---+   +---+   |    ---+   |");
+strcpy_s(maze[10],"|               |       |       |       |               |           |");
+strcpy_s(maze[11],"|   +-------    |    ---+-------+   |   |   +-------------------+   |");
+strcpy_s(maze[12],"|   | $         |               | $$|   |   |                   |   |");
+strcpy_s(maze[13],"|   |    -----------+-------+   +---+   |        ---+-------    | $ |");
+strcpy_s(maze[14],"|   |               |       |       |   |           | $         |   |");
+strcpy_s(maze[15],"|   +-------+   |       |   +---+       |    ---+   +---+-------+   |");
+strcpy_s(maze[16],"|           |   |       |     $ |       |       |       |           |");
+strcpy_s(maze[17],"|-------+   |   +---+-------+-----------+   +-------+       |    ---|");
+strcpy_s(maze[18],"|       |   |     $ |       |               |       |       |       |");
+strcpy_s(maze[19],"|   |   |   +---|       |   |    -----------|   |   |   $   |   |   |");
+strcpy_s(maze[20],"|   |   |$      |       |   |               |   |   |       |   |   |");
+strcpy_s(maze[21],"|   |   +---    |-------+   |   |   +---    | $ |       |   +---|   |");
+strcpy_s(maze[22],"|$$ |           | $$        |   |   |$      | $ |       |       | $ |");
+strcpy_s(maze[23],"+-------------------------------------------------------------------+"); //if no + -> |---|--
+
+//maze ends
+
+//display maze
+for(int i=1;i<25;++i)
+  { gotoxy(0,i);   cout<<maze[i-1]; 
+  }
+
+//setting player position..
+symbol_pos[0].x=1;
+symbol_pos[0].y=2;
+symbol_pos[1].x=2;
+symbol_pos[1].y=2;
+symbol_pos[2].x=3;
+symbol_pos[2].y=2;
+
+int k;                             //player symbol's first appesarance
+for(k=0;k<=2;++k)
+{gotoxy(symbol_pos[k].x,symbol_pos[k].y);
+ cout<<symbol[k];
+}
+
+
+//player is moving...
+char ch;
+for(;;)
+{gotoxy(70,5);
+ cout<<"TIME";
+ gotoxy(73,8);
+ cout<<"SCORE:";
+ gotoxy(75,9);
+ cout<<score;
+ ch=_getch();
+ move(ch);
+}
+
+_getch();
+}

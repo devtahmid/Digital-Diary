@@ -1,0 +1,149 @@
+// nokia snake.cpp : Defines the entry point for the console application.
+//UNDER CONSTRUCTION
+
+#include "stdafx.h"
+#include<iostream>
+#include<time.h>
+using namespace std;
+
+//body=1
+//food=-2
+//wall=-1
+//rest=0
+const int width=70;
+const int height=20;
+int foodpos;
+const int size=height*width;
+int MAP[size];
+void endgame();
+void updatesnake();
+void generatefood();
+void initialise();
+void updatemap();
+void getdirection();
+bool checkfood();
+void updatesnake();
+Node * Create_New_Node(int);
+void Insert_Beg(Node* );
+
+struct Node
+{ int info;
+  Node *next;
+} *headpos,*newptr,*tailpos,*save,*ptr; //newptr=>for insertion,ptr=>spare
+
+void initialise()
+{
+headpos=tailpos=NULL;
+int inf=(width/2)+(height/2)*width;
+newptr=Create_New_Node(inf);
+if(newptr!=NULL)
+{
+endgame();
+}
+Insert_Beg(newptr);
+
+//flag snakes body on MAP
+MAP[newptr->info]=1;
+
+//flag top and bottom walls 
+for(int i=0; i<20;i++)
+{MAP[i]=-1;
+ MAP[i+width*(height-1)]=-1;
+}
+
+//flag right and left walls
+for(int j=0;j<20;++j)
+{ MAP[j*width]=-1;
+  MAP[(width-1)+j*width]=-1;
+}
+
+generatefood();
+}
+
+void generatefood(){
+
+time_t t;
+int x=0;
+int y=0;
+
+do
+{
+ srand( (unsigned) time(&t) );
+x=rand()%(width-2)+1;
+y=rand()%(height-2)+1;
+}while(MAP[x+y*width]!=0);
+
+foodpos=x+y*width;
+MAP[foodpos]=-2;
+
+}
+
+void getdirection(char key)
+{
+int newpos;
+switch(key)
+{
+case 'w' :newpos=headpos->info+width;
+	      break;
+case 'a' :newpos=headpos->info-1;
+	      break;
+case 's' :newpos=headpos->info+1;
+	      break; 
+case 'd' :newpos=headpos->info+width;
+	      break;
+}
+
+bool possible = true;
+ptr=headpos;
+
+//not touching it's body
+while(ptr!=NULL)
+{
+if(newpos==ptr->info)
+{ possible=false; break; }
+
+ptr=ptr->next;
+}
+
+if(possible=false)
+	return;
+
+updatesnake();
+}//getdirection ends 
+
+void updatesnake(int &newpos){
+newptr=Create_New_Node(newpos);
+Insert_Beg(newptr);
+if(checkscore()==0)
+{
+ptr=newptr->next;
+while(ptr!=NULL)
+{
+if(ptr->next==tailpos)
+	break;
+
+ptr=ptr->next;
+}
+tailpos=ptr;
+delete ptr->next;
+
+}
+
+}//updatesnake ends
+
+bool checkfood()
+{if(MAP[headpos->info]==-2)
+ return true;
+else 
+	return false;
+}
+headxpos
+
+
+
+
+
+
+
+
+

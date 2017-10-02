@@ -1,0 +1,314 @@
+// Snake nd ladder.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include<iostream>
+#include<stdlib.h>
+#include<conio.h>
+#include<future>
+#include<time.h>
+#include<iomanip>
+#include"gotoxy.h"
+using namespace std;
+
+
+int playerchoice;
+int playerpos=0;
+int botpos=0;
+
+int playerposline=12;//initialising value has no ,it only ignores a bug in first call of displayboard()
+int botposline=12;   //  same comment as above                               
+
+int ladderarray[2][6]={ {6,8,26,50,55,59} , {16,41,29,93,80,84} };
+int snakearray[2][8]={ {32,60,63,70,73,82,89,97}, {13,38,3,25,47,43,53,12} };
+
+int board[12][12]={
+				 {0,0,0,0,100,99,98,97,0,0,0,0},
+				 {0,0,0,91,92,93,94,95,96,0,0,0},
+				 {0,0,0,90,89,88,87,86,85,0,0,0},
+				 {0,75,76,77,78,79,80,81,82,83,84,0},
+				 {74,73,72,71,70,69,68,67,66,65,64,63},
+				 {51,52,53,54,55,56,57,58,59,60,61,62},
+				 {50,49,48,47,46,45,44,43,42,41,40,39},
+				 {27,28,29,30,31,32,33,34,35,36,37,38},
+				 {0,26,25,24,23,22,21,20,19,18,17,0},
+				 {0,0,0,11,12,13,14,15,16,0,0,0},
+				 {0,0,0,10,9,8,7,6,5,0,0,0},
+				 {0,0,0,0,1,2,3,4,0,0,0,0}
+			   };
+
+
+
+void display(){          //display first clears the screen
+
+system("cls");
+gotoxy(33,2); cout<<"SNAKE AND LADDER";
+gotoxy(24,17); cout<<"POSITION";
+gotoxy(22,17);cout<<"Player : Bot ";
+gotoxy(24,18);cout<<playerpos; gotoxy(32,18);cout<<botpos;
+}
+
+int move(int choice=0){
+
+int addpos;
+int seedval;
+time_t t;
+seedval= (unsigned) time(&t);
+srand(seedval);
+addpos=((choice+(7*rand()))%6)+1;
+
+return addpos;
+
+}
+
+int secondmove(int pos){
+int newpos;
+int j; //as counter for loop
+for( j=0;j<6;++j)
+	if(pos==ladderarray[0][j])
+	{
+	newpos=ladderarray[1][j];
+	return newpos;
+	}
+for( j=0;j<8;++j)
+	if(pos==snakearray[0][j])
+	{
+	newpos=snakearray[1][j];
+	return newpos;
+	}
+
+return pos;
+
+}
+
+void displaydice(int pos){
+
+gotoxy(8,13); cout<<"DICE"; gotoxy(8,14);cout<<"----";
+gotoxy(5,15); cout<<"...........";
+for(int i=16;i<=20;++i)
+{gotoxy(5,i); cout<<":"; gotoxy(15,i); cout<<":"; }
+gotoxy(6,20); cout<<".........";
+
+if (pos==1)
+{gotoxy(10,18); cout<<"O";}
+
+else
+	if(pos==2)
+{gotoxy(12,17); cout<<"O";
+ gotoxy(8,19); cout<<"O";
+}
+
+	else
+		if(pos==3)
+{gotoxy(12,17); cout<<"O";
+ gotoxy(10,18); cout<<"O";
+ gotoxy(8,19); cout<<"O";
+}
+		else
+			if(pos==4)
+{gotoxy(8,17); cout<<"O";
+ gotoxy(12,17); cout<<"O";
+ gotoxy(8,19); cout<<"O";
+ gotoxy(12,19); cout<<"O";
+}
+			else
+				if(pos==5)
+{gotoxy(8,17); cout<<"O";
+ gotoxy(12,17); cout<<"O";
+ gotoxy(10,18); cout<<"O";
+ gotoxy(8,19); cout<<"O";
+ gotoxy(12,19); cout<<"O";
+}
+				else
+					if(pos==6)
+{gotoxy(8,17); cout<<"O";
+ gotoxy(12,17); cout<<"O";
+ gotoxy(8,18); cout<<"O";
+ gotoxy(12,18); cout<<"O";
+ gotoxy(8,19); cout<<"O";
+ gotoxy(12,19); cout<<"O";
+}
+cout<<'\n';
+} // displaydice ends
+
+
+int checkifwon(){
+if(playerpos==100)
+{cout<<"\nYou won!!\nYou beat the me! *-*";
+ return 1;
+}
+if(botpos==100)
+{cout<<"HA! I win!!\n You DIDNT beat me =-D";
+ return 1;
+}
+
+return 0;
+
+}
+
+
+void delay(float sec){
+
+ Sleep(1000*sec);
+
+}
+
+
+void displayboard(){
+// to find in which line playerpos and botpos lies
+
+for(int i=0;i<12;++i)
+for(int j=0;j<12;++j)
+{ if(board[i][j]!=0 && board[i][j]==playerpos)
+    playerposline=i;
+
+  if(board[i][j]!=0 && board[i][j]==botpos)
+    botposline=i;
+}
+	
+int x=40, y=5;// default for x and y starts from next line of y=5
+for(int i=0;i<12;++i)
+{if(i==playerposline||i==botposline)      //if player pos in current line , leave a line for the box's upper part
+    ++y;
+ if(i-1==playerposline||i-1==botposline) //if player pos in previous line , leave a line for the box's lower part
+	 ++y;
+ x=40;       //default
+ gotoxy(x,++y);  //new line for every new row of board
+ for(int j=0;j<12;++j,x+=3)  //x+=3 is position of next number, is used only for displaying box 
+ {
+  if(board[i][j]!=0) //numbers which are not to be displayed are 0, but spaces are displayed for proper shape of board
+  {
+   if(board[i][j]!=playerpos && board[i][j]!=botpos)
+   {  gotoxy(x,y); cout<<setw(3)<<board[i][j]; }
+	  
+   else
+       if(board[i][j]==playerpos)  
+   {
+    gotoxy(x,y); cout<<":";  
+    gotoxy(x,y-1);  cout<<"-----";
+    gotoxy(x,y+1);  cout<<"-----";
+	gotoxy(++x,y);  cout<<setw(3)<<board[i][j];
+	gotoxy(x+3,y); cout<<":";
+    ++x;     // remove and check how it 'harms'
+   }
+
+	   else 
+		   if (board[i][j]==botpos)
+	   {
+		gotoxy(x,y); cout<<":";  
+        gotoxy(x,y-1);  cout<<"=====";
+        gotoxy(x,y+1);  cout<<"=====";
+	    gotoxy(++x,y);  cout<<setw(3)<<board[i][j];
+	    gotoxy(x+3,y);  cout<<":";
+        ++x;
+	   }
+		   else
+			   if(board[i][j]==playerpos && board[i][j]==botpos)
+		   {gotoxy(x,y); cout<<":";  
+            gotoxy(x,y-1);  cout<<"*****";
+            gotoxy(x,y+1);  cout<<"*****";
+	        gotoxy(++x,y);  cout<<setw(3)<<board[i][j];
+	        gotoxy(x+3,y);  cout<<":";
+            ++x;
+           }   
+
+
+  }
+  else 
+	  cout<<"   ";        // three spaces, one is between numbers, other two are for number's position
+
+ }
+ }
+}
+
+void GAME(){
+int addpos;
+int newplayerpos=0;
+int newbotpos=0;
+do{
+Again:display();
+	  gotoxy(4,4); cout<<"Your move(1-5): ";
+	  cin>>playerchoice;
+	  
+	  if(playerchoice<1||playerchoice>5)
+	  {
+	   gotoxy(6,6); cout<<"Dont Troll!";
+	   _getch();
+	   display();
+	   goto Again;
+	  } 
+addpos=move(playerchoice);
+displaydice(addpos);
+delay(0.3);
+gotoxy(6,8); cout<<"Your dice rolled to "<<addpos;
+delay(0.5);
+//proggressing further if updated position is less than 100
+if((playerpos+addpos)<=100)
+{playerpos+=addpos;
+gotoxy(6,9); cout<<"Your position is "<<playerpos;
+
+delay(1);
+newplayerpos=secondmove(playerpos);
+cout<<'\n'; 
+ if(newplayerpos!=playerpos)
+ {
+   if(newplayerpos>playerpos)
+   {gotoxy(6,10); cout<<"You are promoted by "<<newplayerpos-playerpos<<" to "<<newplayerpos;}
+   else
+   	   if(newplayerpos<playerpos)
+		   {gotoxy(6,10); cout<<"\nYou are demoted by "<<playerpos-newplayerpos<<" to "<<newplayerpos; }
+
+  playerpos=newplayerpos; 
+      
+ }
+}
+else 
+{gotoxy(6,11); cout<<" You cant move because your dice\n \trolled to a number which\n \tpositions you above 100\n \tTry better next time";}
+displayboard();
+_getch();
+display();
+
+if(checkifwon())
+   break;
+
+//bot's move
+gotoxy(4,4); cout<<"My move ...";
+
+addpos=move();
+displaydice(addpos);
+delay(0.3);
+if((botpos+addpos)<=100)
+{botpos+=addpos;
+gotoxy(6,8); cout<<"My dice rolled to "<<addpos;
+delay(0.5);
+gotoxy(6,9); cout<<"My position is "<<botpos;
+delay(1);
+newbotpos=secondmove(botpos);
+if(newbotpos!=botpos)
+{
+if(newbotpos>botpos)
+{gotoxy(6,10); cout<<"I am promoted by "<<newbotpos-botpos<<" to "<<newbotpos;}
+else
+	if(newbotpos<botpos)
+	{gotoxy(6,10); cout<<"I am demoted by "<<botpos-newbotpos<<" to "<<newbotpos;}
+      
+botpos=newbotpos;
+}
+}
+else 
+{gotoxy(6,11); cout<<" I cant move because my dice \n \trolled to a number which\n \t positions my above 100\n \tI should try better next time";}
+displayboard();
+_getch();
+display();
+
+if(checkifwon())
+return;
+
+}while(1);
+
+}
+void main(){
+
+GAME();
+
+}

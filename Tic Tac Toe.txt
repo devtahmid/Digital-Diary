@@ -1,0 +1,244 @@
+// TIC TAC TOE.cpp : Defines the entry point for the console application.
+//
+#include"stdafx.h"
+#include<iostream>
+#include<ctype.h>
+#include<stdlib.h>
+#include<conio.h>
+#include<iomanip>
+#include"gotoxy.h"
+using namespace std;
+
+char user_choice;//choice of user , i.e. x or o
+char bot;
+int  user_option;//number entered by user representing position on grid (1-9)
+int position_array[3][9]={{1,2,3,4,5,6,7,8,9},{0,0,0,1,1,1,2,2,2},{0,1,2,0,1,2,0,1,2}};
+char matrix[3][4]={"123","456","789"};
+int move=0;      //number of times moves have been executed
+void display();
+void bot_move();
+void check();
+void delay();
+
+void delay(){
+for(long l=0;l<100000000;++l)
+{}
+}
+
+void display(){
+
+
+gotoxy(37,4);
+cout<<"TIC-TAC-TOE\n\n";
+
+
+gotoxy(33,8);   cout<<matrix[0][0]<<'\t'<<" "<<matrix[0][1]<<'\t'<<matrix[0][2];
+gotoxy(33,12);  cout<<matrix[1][0]<<'\t'<<" "<<matrix[1][1]<<'\t'<<matrix[1][2];
+gotoxy(33,16);  cout<<matrix[2][0]<<'\t'<<" "<<matrix[2][1]<<'\t'<<matrix[2][2];
+
+for(int k=7;k<=17;++k)
+{
+gotoxy(30,k);  cout<<"|";
+gotoxy(37,k);  cout<<"|";
+gotoxy(45,k);  cout<<"|";
+gotoxy(52,k);  cout<<"|";
+}
+
+gotoxy(30,6);  cout<<"-----------------------";
+gotoxy(31,10); cout<<"------+-------+------";
+gotoxy(31,14); cout<<"------+-------+------";
+gotoxy(30,18); cout<<"-----------------------";
+
+
+cout<<'\n';
+} //end of display
+
+void decideMN(int &position,int &m,int &n) //decides position of input based on userchoice
+{
+ for(int j=0;j<9;++j)
+	if(position_array[0][j]==position)
+		{m=position_array[1][j];
+		 n=position_array[2][j];
+		}
+}
+
+void user_move(){
+int m,n;
+for(;;)
+ {delay(); 
+ ++::move;
+reenter:  delay();        
+          system("cls");   // reenter makes user choose only unoccupied positions
+          display();
+          gotoxy(28,21);cout<<"Enter position of "<<user_choice<<"(1-9): ";
+          cin>>user_option;
+		  if(user_option>0&&user_option<10)
+		   { decideMN(user_option,m,n);
+			 if(isdigit(matrix[m][n])) // to prevent occupying occupied places
+                matrix[m][n]=user_choice;
+		   }
+         else 
+			   
+			 goto reenter;
+
+ display();
+ check();
+
+ ++::move;
+ bot_move();
+ display();
+
+ check();
+
+}
+
+}
+
+
+
+
+void bot_move(){      //ch received will be opposite of the user's character
+int randnumber,m,n;
+srand(time(0));
+if(::move==2)           //if it is second move then a random place has to be occupied by bot, a place not yet occupied by user
+{while(1)
+ {randnumber=(rand()%9);
+  m=randnumber/3;
+  n=randnumber%3;
+
+  if(isdigit(matrix[m][n]))
+  {   matrix[m][n]=bot;
+	break;
+  }
+ }
+}
+else
+ if(::move>2 && ::move<9)
+ {   // this  'first; looks for all possible ways for winning(ofensive) and then becomes defensive, flag 0 will mean there isnt anyway for the bot to gain in one try, so starts blocking player's moves(defensive)
+   char chox=bot; // for comparing with grid contents, when flag==0 it changes from bot to user_choice
+   int flag=1,i,j,n;  
+recheck:  //come back if being offensive din't work
+   //horizontal
+   for(i=0;i<3;++i )
+	if((matrix[i][0]==matrix[i][1])&&matrix[i][0]==chox||matrix[i][1]==matrix[i][2]&&matrix[i][1]==chox||matrix[i][0]==matrix[i][2] &&matrix[i][0]==chox)
+	 for(n=0;n<3;++n)
+	  if(isdigit(matrix[i][n]))
+		 {matrix[i][n]=bot; return ;}
+   //vertical
+   for(j=0;j<3;++j)
+	if((matrix[0][j]==matrix[1][j])&&matrix[0][j]==chox||matrix[1][j]==matrix[2][j]&&matrix[1][j]==chox||matrix[0][j]==matrix[2][j]&&matrix[0][j]==chox)
+   for(n=0;n<3;++n)
+    if(isdigit(matrix[n][j]))
+	{matrix[n][j]=bot; return ;}
+  //right diagonal
+   if(matrix[0][0]==matrix[1][1]&&matrix[0][0]==chox||matrix[1][1]==matrix[2][2]&&matrix[1][1]==chox||matrix[0][0]==matrix[2][2]&&matrix[0][0]==chox)
+	 for(n=0;n<3;++n)
+		if(isdigit(matrix[n][n]))
+		{matrix[n][n]=bot; return ; }
+
+   //left diagonal
+   if(matrix[0][2]==matrix[1][1]&&matrix[0][2]==chox||matrix[1][1]==matrix[2][0]&&matrix[1][1]==chox||matrix[0][2]==matrix[2][0]&&matrix[0][2]==chox)
+	for(i=0,j=2;i<3;++i,--j)
+		if(isdigit(matrix[i][j]))
+		{matrix[i][j]=bot; return ; }
+gotoxy(2,1);cout<<flag;
+   
+   if(flag==0) //neither being offensive nor defensive worked , i.e. the first unmarked location is taken by bot
+   for(i=0;i<3;++i)
+   {for(j=0;j<3;++j)
+	 if(isdigit(matrix[i][j]))
+		{matrix[i][j]=bot;
+         gotoxy(2,1);cout<<flag;
+         return;
+        } gotoxy(2,2);cout<<flag;
+   }
+   gotoxy(2,3);cout<<flag;
+   	//moving the below if statement avove will execute the loop irrespective of flag's value	
+   if(flag==1) //get defensive
+   {gotoxy(2,4); cout<<flag;
+	   flag=0; 
+
+   chox=user_choice;
+   goto recheck;
+   }
+ }
+
+}
+//if there is a win the game abruptly exits with a message, it should return to the main menu when it is linked with the other games
+void check()
+{
+gotoxy(30,23);
+int i;
+//checking columns
+for(i=0;i<3;++i)
+if(matrix[0][i]==matrix[1][i]&&matrix[0][0]==matrix[2][i])
+{if(matrix[0][i]==user_choice)
+ cout<<"WOW YOU MUST BE A GENIUS!";
+ else
+ cout<<"HA! Take that!!";
+ exit(0);
+}
+//checking rows
+for(i=0;i<3;++i)
+if(matrix[i][0]==matrix[i][1]&&matrix[i][0]==matrix[i][2])
+{if(matrix[i][0]==user_choice)
+ cout<<"WOW YOU MUST BE A GENIUS!";
+ else
+ cout<<"HA! Take that!!";
+ exit(0);
+}
+
+//checking left diagnal
+if(matrix[0][2]==matrix[1][1]&&matrix[0][2]==matrix[2][0])
+{if(matrix[0][0]==user_choice)
+ cout<<"WOW YOU MUST BE A GENIUS!";
+ else
+ cout<<"HA! Take that!!";
+ exit(0);
+}
+//checking right diagonal
+if(matrix[0][0]==matrix[1][1]&&matrix[0][0]==matrix[2][2])
+{if(matrix[0][0]==user_choice)
+ cout<<"WOW YOU MUST BE A GENIUS!";
+ else
+ cout<<"HA! Take that!!";
+ exit(0);
+}
+
+int flag=0;          //none won or lost
+
+for(int i=0;i<3;++i)
+	for(int j=0;j<3;++j)
+	  if( isdigit(matrix[i][j]))
+		flag=1;                        //if flag still 0, then no moves left,therefore draw
+
+if(flag==0)                      //draw
+cout<<"DRAW:( ";
+
+if(flag==0)                    //if draw then exit but if flag==0 then not draw therefore should return to user_move
+exit(0);
+
+
+}
+
+void main()
+{
+
+again:system("cls");
+	  display();
+	  gotoxy(28,21); cout<<"Who shall play first, x or o ? : ";
+	  cin>>user_choice;
+	  cout<<'\n';
+	  if(user_choice=='o'||user_choice=='O')
+	   {  bot='X';
+	    user_move();
+	   }
+	  else if(user_choice=='x'||user_choice=='X')
+	  {bot='O';
+	   user_move();
+	  }
+	  else
+	  gotoxy(32,23);cout<<"WRONG INPUT!!\tTRY AGAIN";
+	  _getch();
+	  goto again;
+}
