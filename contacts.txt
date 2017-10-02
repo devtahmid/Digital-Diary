@@ -205,10 +205,8 @@ fstream file("ContactsFile.dat",ios::ate,ios::binary);
 file.seekg(0,ios::beg);
 while(!file.eof())
 { file.read((char*)&C,sizeof(C));
-	view();
- cout<<C.name<<'\t'<<C.email_id<<'\t'<<C.phone<<'\t'<<C.pobox;
- cout<<'\n'<<X.name<<'\t'<<X.email_id<<'\t'<<X.phone<<'\t'<<X.pobox;
- if((_strcmpi(X.name,C.name)==0)&&(X.phone==C.phone)&&(_strcmpi(X.email_id,C.email_id)==0)&&(X.pobox==C.pobox))
+
+ if((strcmpi(X.name,C.name)==0)&&(X.phone==C.phone)&&(strcmpi(X.email_id,C.email_id)==0)&&(X.pobox==C.pobox))
 {
 int choice;
 do{
@@ -270,7 +268,7 @@ cout<<C.name<<'\n'<<C.email_id<<'\n'<<C.phone<<'\n'<<C.pobox;
 char ch;
 cout<<"\n\n\npress anyh key to continue!!!!!";
 
-ch=_getch();
+ch=getch();
 }
 
 
