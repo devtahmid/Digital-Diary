@@ -1,0 +1,330 @@
+// Contacts-digital diary.cpp : Defines the entry point for the console application.
+//normally texts start from (5,5) and end at (75,20)
+
+//edit()'s read isn't working 
+
+#include "stdafx.h"
+#include "gotoxyprint.h"
+#include <iostream>
+#include <fstream>
+#include <stdio.h>
+#include <string.h>
+#include <conio.h>
+using namespace std;
+
+struct Contacts_struct{
+char name[35];
+long phone;
+char email_id[35];
+int pobox; //Po Box or Zip
+};
+
+class Contacts{
+private: 
+	void border();
+
+public:
+	Contacts()
+	{
+		Main_Menu();
+	}
+
+	void Main_Menu();
+	void view(); //shows first few contacts
+	void add();
+	void search();
+	void edit(Contacts_struct);
+	//void erase(Contacts_struct C);
+	void display(Contacts_struct);   //sub function of displaying function, displays only the contact card
+	
+};
+
+
+void Contacts::add(){
+border();
+Contacts_struct C;
+ofstream fout("ContactsFile.dat",ios::app,ios::binary);
+gotoxyprint(5,5,"Enter Name: ");
+cin>>C.name;  // replace with gets in turbo
+gotoxyprint(5,6,"Enter Phone Number : ");
+cin>>C.phone;
+gotoxyprint(5,7,"Enter e-mail id : ");
+cin>>C.email_id;
+gotoxyprint(5,8,"Enter PO/Zip: ");
+cin>>C.pobox;
+
+fout.write((char*)&C,sizeof(C));
+fout.close();
+}
+
+void Contacts::search(){
+border();
+Contacts_struct C;
+ifstream fin("ContactsFile.dat",ios::binary);
+char str[35];  //spare string
+long val;    //spare value
+int option;   //to choose option in switch
+char A;       //to use getch()
+bool flag=0;
+fin.seekg(0);
+do{
+border();
+gotoxyprint(5,5,"1)Name");
+gotoxyprint(5,6,"2)Phone Number");
+gotoxyprint(5,7,"3)e-mail id");
+gotoxyprint(5,8,"4)PoBox/Zip");
+gotoxyprint(5,9,"5)Return to Main Menu");
+gotoxyprint(5,11,"Enter means to search contact by: ");
+cin>>option;
+switch(option)
+{
+case 1:border();
+	   gotoxyprint(5,5,"Enter Name: ");
+	   cin>>str;
+	   fin.seekg(0);
+	   while(!fin.eof())
+	   { fin.read((char*)&C,sizeof(C));
+	     if(_strcmpi(C.name,str)==0)
+	        {display(C); 
+		     flag=1; //if error use true and false(begining of function)
+			 break;
+		    }
+	   }
+	   if(flag==0)
+		   gotoxyprint(5,7,"\nItem match not found ");
+	   gotoxyprint(5,8,"Enter any  character to continue to continue ");
+	   A=_getch();
+	   break;
+
+case 2:border();
+	   gotoxyprint(5,5,"Enter Phone Number: ");
+	   cin>>val;
+	   fin.seekg(0);
+	   while(!fin.eof())
+	   { fin.read((char*)&C,sizeof(C));
+	     if(C.phone==val)
+	        {display(C); 
+		     flag=1; //if error use true and false(begining of function)
+			 break;
+		    }
+	   }
+	   if(flag==0)
+		   gotoxyprint(5,7,"Item match not found ");
+	   gotoxyprint(5,8,"Enter any  character to continue to continue ");
+	   A=_getch();
+	   break;
+ 
+case 3:border();
+	   gotoxyprint(5,5,"Enter e-mail id: ");
+	   cin>>str;
+	   fin.seekg(0);
+	   while(!fin.eof())
+	   { fin.read((char*)&C,sizeof(C));
+	   if(_strcmpi(C.email_id,str)==0)
+	        {display(C); 
+		     flag=1; //if error use true and false(begining of function)
+			 break;
+		    }
+	   }
+	   if(flag==0)
+		   gotoxyprint(5,7,"Item match not found ");
+	   gotoxyprint(5,8,"Enter any  character to continue to continue ");
+	   A=_getch();
+	   break;
+
+case 4:border();
+	   gotoxyprint(5,5,"Enter Po Box/Zip: ");
+	   cin>>val;
+	   fin.seekg(0);
+	   while(!fin.eof())
+	   { fin.read((char*)&C,sizeof(C));
+	   if(C.pobox==val)
+	        {display(C); 
+		     flag=1; //if error use true and false(begining of function)
+			 break;
+		    }
+	   }
+	   if(flag==0)
+		   gotoxyprint(5,7,"Item match not found ");
+	   gotoxyprint(5,8,"Enter any  character to continue to continue ");
+	   A=_getch();
+	   break;
+
+case 5: break;
+
+default:gotoxyprint(5,13,"Wrong choice!");
+}
+}while(option!=5);
+if(option==5)
+	Main_Menu();
+}
+
+
+void Contacts::display(Contacts_struct C){
+border();
+
+int choice;
+//displaying contact in a box....
+//top and bottom line of box
+for(int x=8;x<=65;++x)
+{   gotoxyprint(x,8,"-");
+	gotoxyprint(x,18,"-");
+}
+//right and left line of box
+for(int y=9;y<=17;++y)
+{
+	gotoxyprint(8,y,"|");
+	gotoxyprint(65,y,"|");
+}
+//displaying contact box ends
+
+gotoxyprint(10,10,"Name: "); gotoxyprint(30,10,C.name);
+gotoxyprint(10,12,"Phone Number : "); gotoxy(30,12); cout<<C.phone;
+gotoxyprint(10,14,"E-mail id : "); gotoxyprint(30,14,C.email_id);
+gotoxyprint(10,16,"PO/Zip: "); gotoxy(30,16); cout<<C.pobox;
+
+gotoxyprint(10,20,"View      Edit      Delete      Return to Main Menu");
+gotoxyprint(10,21,"Enter option:");
+cin>>choice;
+switch(choice) 
+{
+case 2:edit(C);
+       break;
+case 3://erase(C);
+	   break;
+
+}
+
+}
+
+
+void Contacts::edit(Contacts_struct X){
+	border();
+Contacts_struct C;
+fstream file("ContactsFile.dat",ios::ate,ios::binary);
+file.seekg(0,ios::beg);
+while(!file.eof())
+{ file.read((char*)&C,sizeof(C));
+	view();
+ cout<<C.name<<'\t'<<C.email_id<<'\t'<<C.phone<<'\t'<<C.pobox;
+ cout<<'\n'<<X.name<<'\t'<<X.email_id<<'\t'<<X.phone<<'\t'<<X.pobox;
+ if((_strcmpi(X.name,C.name)==0)&&(X.phone==C.phone)&&(_strcmpi(X.email_id,C.email_id)==0)&&(X.pobox==C.pobox))
+{
+int choice;
+do{
+gotoxyprint(10,8,"Name: "); cout<<C.name;
+gotoxyprint(10,9,"Phone Number : "); cout<<C.phone;
+gotoxyprint(10,10,"E-mail id : "); cout<<C.email_id;
+gotoxyprint(10,11,"PO/Zip: "); cout<<C.pobox;
+gotoxyprint(10,14,"1)Name");
+gotoxyprint(10,15,"2)Phone Number");
+gotoxyprint(10,14,"3)e-mail id");
+gotoxyprint(10,15,"4)Po Box/Zip");
+gotoxyprint(10,16,"5)None");
+gotoxyprint(10,18,"What would you like to edit?:");
+cin>>choice;
+border();
+switch(choice){
+
+case 1:gotoxyprint(5,5,"Enter new name: ");
+       cin>>C.name;
+	   break;
+case 2:gotoxyprint(5,6,"Enter new number: ");
+	   cin>>C.phone;
+       break;
+case 3:gotoxyprint(5,7,"Enter new e-mail id: ");
+	   cin>>C.email_id;
+       break;
+case 4:gotoxyprint(5,8,"Enter new Po Box/Zip: ");
+	   cin>>C.pobox;
+	   break;
+case 5:break;
+default:gotoxyprint(10,19,"Wrong choice!!");
+}
+}while(choice!=5);
+int filepointer=file.tellp();
+file.seekp(filepointer-sizeof(C),ios::beg);
+file.write((char*)&C,sizeof(C));
+if(choice==5)
+	exit(0);
+break; //break out of while loop
+}
+}
+file.close();
+} //edit() ends 
+
+
+void Contacts::view(){
+border();
+
+Contacts_struct C;
+ifstream file("ContactsFile.dat",ios::ate,ios::binary);
+file.seekg(0,ios::beg);
+while(file.read((char*)&C,sizeof(C)))
+{ 
+int y=5;
+gotoxy(5,y);
+cout<<C.name<<'\n'<<C.email_id<<'\n'<<C.phone<<'\n'<<C.pobox;
+++y;
+}
+char ch;
+cout<<"\n\n\npress anyh key to continue!!!!!";
+
+ch=_getch();
+}
+
+
+void Contacts::Main_Menu(){
+int option;
+do{
+border();
+gotoxyprint(5,5,"1)View");
+gotoxyprint(5,6,"2)Add");
+gotoxyprint(5,7,"3)Search");
+gotoxyprint(5,8,"Choose your option: ");
+cin>>option;
+
+switch(option){
+case 1: view();
+	    break;
+case 2:add();
+	   break;
+case 3:search();
+	   break;
+default:gotoxyprint(5,11,"Wrong choice!!");
+}
+}while(option!=4);
+if(option==4)
+
+	return;
+}
+
+void Contacts::border(){  //clears screen before displaying border
+system("cls");
+for(int x=1;x<=80;++x)
+{
+gotoxy(x,1);
+cout<<"*";
+gotoxy(x,24);
+cout<<"*";
+}
+
+for(int y=1;y<=24;++y)
+{
+gotoxy(1,y);
+cout<<"*";
+gotoxy(80,y);
+cout<<"*";
+}
+
+
+}
+
+void main(){
+
+
+	Contacts C;
+
+
+
+}
