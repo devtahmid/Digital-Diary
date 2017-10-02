@@ -1,3 +1,3 @@
-#Digital Dary
+#Digital Diary
 
-Files from this branch will be added to master branch
+All versions of contacts class will be in this branch
