@@ -6,10 +6,10 @@
 #include<time.h>
 using namespace std;
 
-//body=1
-//food=-2
-//wall=-1
-//rest=0
+//body=1 , represented by O
+//food=-2 , represented by $
+//wall=-1  , represented by # 
+//rest=0  , represented by ' '
 const int width=70;
 const int height=20;
 int foodpos;
@@ -31,12 +31,12 @@ struct Node
   Node *next;
 } *headpos,*newptr,*tailpos,*save,*ptr; //newptr=>for insertion,ptr=>spare
 
-void initialise()
+void initiate()
 {
 headpos=tailpos=NULL;
 int inf=(width/2)+(height/2)*width;
 newptr=Create_New_Node(inf);
-if(newptr!=NULL)
+if(newptr==NULL)
 {
 endgame();
 }
@@ -83,7 +83,7 @@ void getdirection(char key)
 int newpos;
 switch(key)
 {
-case 'w' :newpos=headpos->info+width;
+case 'w' :newpos=headpos->info-width;
 	      break;
 case 'a' :newpos=headpos->info-1;
 	      break;
@@ -93,7 +93,7 @@ case 'd' :newpos=headpos->info+width;
 	      break;
 }
 
-bool possible = true;
+bool possible = true;   //int possible=1;     for  turbo
 ptr=headpos;
 
 //not touching it's body
@@ -107,8 +107,8 @@ ptr=ptr->next;
 
 if(possible=false)
 	return;
-
-updatesnake();
+else
+updatesnake(newpos);
 }//getdirection ends 
 
 void updatesnake(int &newpos){
@@ -116,7 +116,8 @@ newptr=Create_New_Node(newpos);
 Insert_Beg(newptr);
 if(checkscore()==0)
 {
-ptr=newptr->next;
+//ptr=newptr->next;
+ptr=headpos;
 while(ptr!=NULL)
 {
 if(ptr->next==tailpos)
@@ -131,18 +132,60 @@ delete ptr->next;
 
 }//updatesnake ends
 
-bool checkfood()
+int checkscore()  //if food is eaten
 {if(MAP[headpos->info]==-2)
- return true;
+ return 1;
 else 
-	return false;
+	return 0;
 }
-headxpos
+
+void update_map(){
+if(checkscore()==1)
+{
+score+=2;
+generatefood();
+}
+
+ptr=headpos;
+
+for(int i=0;i<size;++i)
+if(MAP[i]>0)
+--MAP[i];
+
+while(ptr!=NULL)
+{
+MAP[ptr->inf]=1;
+ptr=ptr->next;
+}
+
+}
+
+void display(){
+for(int y=0;y<height;++y)
+for(int x=0;x<width;++x)
+cout<<Get_Map_Value(MAP[x+y*width]);
+cout<<'\n';
+}
+
+char Get_Map_Value(int value)
+{
+switch(value)
+{
+case -2:return '$';
+case -1:return '*';
+case 0: return ' ';
+case 1: return 'O';
+}
+}
+
+void rungame(){
+initiate();
+gotoxy(75,15); // cursor blinks outside playground
+do{
 
 
-
-
-
+}while();
+}
 
 
 
