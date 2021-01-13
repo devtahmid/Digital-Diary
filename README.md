@@ -1,6 +1,6 @@
 # Digital-Diary
 
-The diary will provide the following services.
+The diary provides the following services.
 
 1) Contacts
 2) Calender
@@ -9,9 +9,13 @@ The diary will provide the following services.
 i) Snake and Ladder
 ii) Maze Runner
 iii) Tic Tac Toe
-iv) Snake Mania
 5) Horoscope
 6) Converter
 7) Calculator
 
-Each of these features will have a seperate classe and will be finally embedded in to the main class.
+Each of these features are implemented as a class in the cpp file
+
+TODO: 
+1. Seperate the classes into different files and include in the main file
+2. Add the Snake Mania game, it's the 2D snake game that used to be playable in the old nokia phones
+
